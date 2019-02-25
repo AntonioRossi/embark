@@ -403,7 +403,7 @@ class BlockchainConnector {
       'get',
       '/embark-api/blockchain/transactions/:hash',
       (req, res) => {
-        self.getTransactionByRawTransactionHash(req.params.hash, (err, transaction) => {
+        self.getTransactionByHash(req.params.hash, (err, transaction) => {
           if (err) {
             self.logger.error(err);
           }
