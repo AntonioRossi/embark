@@ -175,19 +175,6 @@ class BlockchainConnector {
         return self.logger.error(err);
       }
       self.provider.startWeb3Provider(async () => {
-        this.getNetworkId()
-          .then(id => {
-            let networkId = self.config.blockchainConfig.networkId;
-            if (!networkId && constants.blockchain.networkIds[self.config.blockchainConfig.networkType]) {
-              networkId = constants.blockchain.networkIds[self.config.blockchainConfig.networkType];
-            }
-            if (networkId && id.toString() !== networkId.toString()) {
-              self.logger.warn(__('Connected to a blockchain node on network {{realId}} while your config specifies {{configId}}', {realId: id, configId: networkId}));
-              self.logger.warn(__('Make sure you started the right blockchain node'));
-            }
-          })
-          .catch(console.error);
-
         try {
           const blockNumber = await self.web3.eth.getBlockNumber();
           await self.web3.eth.getBlock(blockNumber);
@@ -204,6 +191,21 @@ class BlockchainConnector {
           }
           self.logger.error(errorMessage);
           cb(errorMessage);
+        }
+
+        try {
+          const id = await this.getNetworkId();
+          let networkId = self.config.blockchainConfig.networkId;
+          if (!networkId &&
+            constants.blockchain.networkIds[self.config.blockchainConfig.networkType]) {
+            networkId = constants.blockchain.networkIds[self.config.blockchainConfig.networkType];
+          }
+          if (networkId && id.toString() !== networkId.toString()) {
+            self.logger.warn(__('Connected to a blockchain node on network {{realId}} while your config specifies {{configId}}', {realId: id, configId: networkId}));
+            self.logger.warn(__('Make sure you started the right blockchain node'));
+          }
+        } catch (e) {
+          console.error(e);
         }
       });
     });
