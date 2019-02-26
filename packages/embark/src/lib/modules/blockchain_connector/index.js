@@ -174,7 +174,7 @@ class BlockchainConnector {
       if (err) {
         return self.logger.error(err);
       }
-      self.provider.startWeb3Provider(() => {
+      self.provider.startWeb3Provider(async () => {
         this.getNetworkId()
           .then(id => {
             let networkId = self.config.blockchainConfig.networkId;
@@ -187,10 +187,24 @@ class BlockchainConnector {
             }
           })
           .catch(console.error);
-        self.provider.fundAccounts(() => {
-          self._emitWeb3Ready();
-          cb();
-        });
+
+        try {
+          const blockNumber = await self.web3.eth.getBlockNumber();
+          await self.web3.eth.getBlock(blockNumber);
+          self.provider.fundAccounts(() => {
+            self._emitWeb3Ready();
+            cb();
+          });
+        } catch (e) {
+          const errorMessage = e.message || e;
+          if (errorMessage.indexOf('no suitable peers available') > 0) {
+            self.logger.warn(errorMessage);
+            self.logger.warn(__('Your node is probably not synchronized. Wait until your node is synchronized before deploying'));
+            process.exit(1);
+          }
+          self.logger.error(errorMessage);
+          cb(errorMessage);
+        }
       });
     });
   }
