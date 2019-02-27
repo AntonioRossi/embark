@@ -240,6 +240,7 @@ class Cmd {
               '                       embark - ' + __('use the node of a running embark process') + '\n' +
               '                       <endpoint> - ' + __('connect to and use the specified node'))
       .option('-d , --gasDetails', __('print the gas cost for each contract deployment when running the tests'))
+      .option('-t , --txDetails', __('print the details of the transactions that happen during tests'))
       .option('-c , --coverage', __('generate a coverage report after running the tests (vm only)'))
       .option('--nobrowser', __('do not start browser after coverage report is generated'))
       .option('--locale [locale]', __('language to use (default: en)'))
@@ -261,8 +262,17 @@ class Cmd {
           process.exit(1);
         }
         i18n.setOrDetectLocale(options.locale);
-        embark.runTests({file, solc:options.solc, logLevel: options.loglevel, gasDetails: options.gasDetails,
-          node: options.node, coverage: options.coverage, noBrowser: options.nobrowser, env: options.env || 'development'});
+        embark.runTests({
+          file,
+          solc: options.solc,
+          logLevel: options.loglevel,
+          gasDetails: options.gasDetails,
+          txDetails: options.txDetails,
+          node: options.node,
+          coverage: options.coverage,
+          noBrowser: options.nobrowser,
+          env: options.env || 'development'
+        });
       });
   }
 
