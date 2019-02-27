@@ -19,9 +19,10 @@ class REPL {
     }
   }
 
-  enhancedEval(cmd, _context, _filename, _callback) {
+  enhancedEval(cmd, _context, _filename, callback) {
     this.events.request('console:executeCmd', cmd.trim(), (err, message) => {
       this.logger.info(message === undefined ? '' : message);
+      callback();
     });
   }
 

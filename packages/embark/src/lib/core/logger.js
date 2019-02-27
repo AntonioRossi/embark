@@ -10,7 +10,18 @@ class Logger {
     this.events = options.events || {emit: function(){}};
     this.logLevels = Object.keys(Logger.logLevels);
     this.logLevel = options.logLevel || 'info';
-    this.logFunction = options.logFunction || console.log;
+    this._logFunction = options.logFunction || console.log;
+    this.logFunction = function() {
+      const args = Array.from(arguments);
+      const color = args[args.length - 1];
+      args.splice(args.length - 1, 1);
+      this._logFunction(...args.map(arg => {
+        if (color) {
+          return typeof arg === 'object' ? JSON.stringify(arg, null, 2)[color] : arg[color];
+        }
+        return typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg;
+      }));
+    };
     this.logFile = options.logFile;
     this.context = options.context;
   }
@@ -90,7 +101,7 @@ Logger.prototype.error = function () {
     return;
   }
   this.events.emit("log", "error", ...arguments);
-  this.logFunction(...Array.from(arguments).map(t => { return t ? t.red : t; }));
+  this.logFunction(...Array.from(arguments), 'red');
   this.writeToFile("[error]: ", ...arguments);
 };
 
@@ -99,7 +110,7 @@ Logger.prototype.warn = function () {
     return;
   }
   this.events.emit("log", "warn", ...arguments);
-  this.logFunction(...Array.from(arguments).map(t => { return t ? t.yellow : t; }));
+  this.logFunction(...Array.from(arguments), 'yellow');
   this.writeToFile("[warning]: ", ...arguments);
 };
 
@@ -108,7 +119,7 @@ Logger.prototype.info = function () {
     return;
   }
   this.events.emit("log", "info", ...arguments);
-  this.logFunction(...Array.from(arguments).map(t => { return t ? t.green : t; }));
+  this.logFunction(...Array.from(arguments), 'green');
   this.writeToFile("[info]: ", ...arguments);
 };
 
@@ -117,7 +128,7 @@ Logger.prototype.debug = function () {
     return;
   }
   this.events.emit("log", "debug", ...arguments);
-  this.logFunction(...arguments);
+  this.logFunction(...arguments, null);
   this.writeToFile("[debug]: ", ...arguments);
 };
 
@@ -126,7 +137,7 @@ Logger.prototype.trace = function () {
     return;
   }
   this.events.emit("log", "trace", ...arguments);
-  this.logFunction(...arguments);
+  this.logFunction(...arguments, null);
   this.writeToFile("[trace]: ", ...arguments);
 };
 
@@ -135,7 +146,7 @@ Logger.prototype.dir = function (txt) {
     return;
   }
   this.events.emit("log", "dir", txt);
-  this.logFunction(txt);
+  this.logFunction(txt, null);
   this.writeToFile("[dir]: ", ...arguments);
 };
 
