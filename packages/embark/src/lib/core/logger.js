@@ -1,6 +1,7 @@
 require('colors');
 let fs = require('./fs.js');
 const date = require('date-and-time');
+const util = require('util');
 
 const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss:SSS';
 const LOG_REGEX = new RegExp(/\[(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d:\d\d\d)\] (?:\[(\w*)\]:?)?\s?\s?(.*)/gmi);
@@ -17,9 +18,9 @@ class Logger {
       args.splice(args.length - 1, 1);
       this._logFunction(...args.map(arg => {
         if (color) {
-          return typeof arg === 'object' ? JSON.stringify(arg, null, 2)[color] : arg[color];
+          return typeof arg === 'object' ? util.inspect(arg, 2)[color] : arg[color];
         }
-        return typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg;
+        return typeof arg === 'object' ? util.inspect(arg, 2) : arg;
       }));
     };
     this.logFile = options.logFile;
