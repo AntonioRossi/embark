@@ -10,7 +10,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/embark-framework/embark/badge.svg)](https://coveralls.io/github/embark-framework/embark)
 
 What is Embark
-======
+==============
 
 Embark is a framework that allows you to easily develop and deploy Decentralized Applications (DApps).
 
